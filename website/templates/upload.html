@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV File Preview</title>
+</head>
+<body>
+    <h1>CSV File Upload</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="semester">Select Semester:</label>
+        <select name="semester" id="semester">
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select><br><br>
+        
+        <label for="session">Select Session:</label>
+        <select name="session" id="session">
+            <option value="1">2020 - 2021</option>
+            <option value="2">2021 - 2022</option>
+            <option value="3">2022 - 2023</option>
+            <option value="4">2023 - 2024</option>
+            <option value="5">2024 - 2025</option>
+            <option value="6">2025 - 2026</option>
+            <option value="7">2026 - 2027</option>
+            <option value="8">2027 - 2028</option>
+            <option value="9">2028 - 2029</option>
+            <option value="10">2029 - 2030</option>
+        </select><br><br>
+        
+        <input type="file" id="fileInput" name="file">
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Preview</h2>
+    <div id="preview"></div>
+
+    <script>
+        function previewFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const csv = event.target.result;
+                const lines = csv.split('\n');
+                const table = document.createElement('table');
+
+                // Create table headers
+                const headers = lines[0].split(',');
+                const headerRow = document.createElement('tr');
+                headers.forEach(header => {
+                    const th = document.createElement('th');
+                    th.textContent = header.trim();
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+
+                // Populate table with data
+                for (let i = 1; i <= 10 && i < lines.length; i++) {
+                    const rowData = lines[i].split(',');
+                    const row = document.createElement('tr');
+                    rowData.forEach(cell => {
+                        const td = document.createElement('td');
+                        td.textContent = cell.trim();
+                        row.appendChild(td);
+                    });
+                    table.appendChild(row);
+                }
+
+                // Display the table
+                const preview = document.getElementById('preview');
+                preview.innerHTML = '';
+                preview.appendChild(table);
+            };
+
+            reader.readAsText(file);
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Process response data if needed
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        const fileInput = document.getElementById('fileInput');
+        fileInput.addEventListener('change', previewFile);
+
+        const uploadButton = document.getElementById('uploadButton');
+        uploadButton.addEventListener('click', uploadFile);
+    </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin-Dashboard</title>
+    <link href="static\style.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+  </head>
+  <body>
+    <div class="bg-[#e4e0e0] h-screen relative">
+      <div
+        id="overlay"
+        class="absolute left-0 h-screen w-screen bg-black/70 text-gray-600 hidden"
+      >
+        <div class="sidebar bg-white h-full px-9 py-5">
+          <nav class="flex items-center gap-9">
+            <i id="cancel" class="p-1 fa-solid fa-x text-2xl"></i>
+            <h1 class="text-lg font-medium ml-11">HallAllocation</h1>
+          </nav>
+
+          <div class="menus mt-16">
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-solid fa-qrcode"></i>
+              <h3 class="font-medium">Dashboard</h3>
+            </div>
+
+            <div class="flex items-center gap-4 mb-9">
+              <a href="./upload">
+                <i class="fa-regular fa-calendar-days"></i>
+                <h3 class="font-medium">Schedule</h3>
+              </a>
+            </div>
+
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-regular fa-comment-dots"></i>
+              <h3 class="font-medium">Feedback</h3>
+            </div>
+
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <h3 class="font-medium">Signout</h3>
+            </div>
+          </div>
+        </div>
+        <div class=""></div>
+      </div>
+      <nav
+        class="w-screen flex justify-between text-gray-600 px-9 py-4 bg-white"
+      >
+        <div class="flex items-center gap-4">
+          <i id="b-menu" class="p-1 fa-solid fa-bars text-2xl"></i>
+
+          <div class="flex gap-6 items-center tracking-wide">
+            <h1 class="text-lg font-medium">HallAllocation</h1>
+            <span>|</span>
+            <p class="text-[15px] pt-[2px]">Dashboard</p>
+          </div>
+        </div>
+        <h
+          class="user-logo font-medium text-xl border-2 py-1 px-3 rounded-full border-gray-600 text-gray-600"
+          >H</h
+        >
+      </nav>
+
+      <div class="w-full flex items-center justify-center mt-[270px]">
+        <div class="text-center">
+          <h1 class="font-medium tracking-wider text-4xl">
+            Welcome to your Dashboard
+          </h1>
+          <h3 class="mt-4 text-gray-600 font-bold tracking-wide text-2xl mb-9">
+            Honour Daniel
+          </h3>
+          <button
+            class="bg-gray-600 text-[#e4e0e0] text-sm px-6 py-4 rounded tracking-wide"
+          >
+            View Schedule
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const bMenu = document.querySelector("#b-menu");
+      const cancel = document.querySelector("#cancel");
+      const overlay = document.querySelector("#overlay");
+
+      const toggleSidebar = (removeThis, addThis) => {
+        if (overlay.classList.contains(removeThis)) {
+          overlay.classList.remove(removeThis);
+          overlay.classList.add(addThis);
+        }
+      };
+
+      bMenu.addEventListener("click", () => toggleSidebar("hidden", "flex"));
+      cancel.addEventListener("click", () => toggleSidebar("flex", "hidden"));
+    </script>
+  </body>
+</html>

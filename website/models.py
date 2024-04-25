@@ -79,6 +79,7 @@ class Activity(db.Model):
     total_participants = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    category = db.relationship('Activitycategory', backref='activities')
 
 
 class Time(db.Model):
@@ -86,7 +87,13 @@ class Time(db.Model):
     start_time = db.Column(db.Time)
     end_time = db.Column(db.Time)
     duration = db.Column(db.Integer)
+
+class Timetable(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, nullable=False)
+    semester_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=False)
+    activity = db.Column(db.String(255), nullable=False)
+    department = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-

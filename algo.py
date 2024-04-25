@@ -1,12 +1,52 @@
 import random
 from datetime import datetime, timedelta
 import calendar
+from website import db
+from website.models import Users, Role, Biodata, Activitycategory, Occurrence, semester, Activity, Time # type: ignore
+from website import create_app
+from website.timeslot import generate_timeslots
 
-def filter_activities_by_duration(activity_info, timeslot, global_variable, end_date_str):
+def retrieve_activities():
+    app = create_app()
+    with app.app_context():
+        # Querying activities and joining with Occurrence to get the type
+        activities = (
+            db.session.query(
+                Activity.name,
+                Occurrence.type,
+                Activity.duration,
+                Activity.total_participants,
+                Activity.category_id
+            )
+            .join(Occurrence, Activity.occurrence_id == Occurrence.id)
+            .order_by(Activity.category_id)
+            .all()
+        )
+
+        # Extracting the desired fields from each activity
+        activity_info = []
+        for activity in activities:
+            activity_data = {
+                'name': activity.name,
+                'duration': activity.duration,
+                'occurrence_type': activity.type,  
+                'total_participants': activity.total_participants,
+                'category_id': activity.category_id
+            }
+            activity_info.append(activity_data)
+
+        return activity_info
+
+# Now you call the function to retrieve activities
+activity_info = retrieve_activities()
+
+
+
+def filter_activities_by_duration(activity_info, timeslot, timetable, end_date_str):
     for activity in activity_info:
         if activity_duration_fits_timeslot(activity, timeslot):
             activity_occurence = activity['occurrence_type']
-            for item in global_variable:
+            for item in timetable:
                 if item[1] == timeslot:
                     break  # Exit the loop if the item already exists
                 if item[1][0] == timeslot[0] and item[1][2] > timeslot[1]:
@@ -15,16 +55,16 @@ def filter_activities_by_duration(activity_info, timeslot, global_variable, end_
                     break
             else:
                 if activity_occurence == 'once':
-                    global_variable = schedule_once(activity, timeslot, global_variable)
+                    timetable = schedule_once(activity, timeslot, timetable)
                 if activity_occurence == 'weekly':
-                    global_variable = schedule_weekly(activity, timeslot, global_variable, end_date_str)
+                    timetable = schedule_weekly(activity, timeslot, timetable, end_date_str)
                 if activity_occurence == 'twice weekly':
-                    global_variable = schedule_twice_weekly(activity, timeslot, global_variable, end_date_str)
+                    timetable = schedule_twice_weekly(activity, timeslot, timetable, end_date_str)
                 if activity_occurence == 'Bi-weekly':
-                    global_variable = schedule_bi_weekly(activity, timeslot, global_variable, end_date_str)
+                    timetable = schedule_bi_weekly(activity, timeslot, timetable, end_date_str)
                 if activity_occurence == 'monthly':
-                    global_variable = schedule_monthly(activity, timeslot, global_variable, end_date_str)
-    return global_variable
+                    timetable = schedule_monthly(activity, timeslot, timetable, end_date_str)
+    return timetable
 
 
 
@@ -52,22 +92,22 @@ def calculate_timeslot_duration(start_time, end_time):
 
 
 
-def schedule_once(activity, timeslot, global_variable):       
+def schedule_once(activity, timeslot, timetable):       
     # Check if the value corresponds to any existing item in the global variable
-    for item in global_variable:
+    for item in timetable:
         if item[0] == activity:
             break  
     else:
         # If the item doesn't exist, append it to the global variables
-        global_variable.append((activity, timeslot))
+        timetable.append((activity, timeslot))
     
-    return global_variable
+    return timetable
 
 
 
-def schedule_weekly(activity, timeslot, global_variable, end_date_str):      
+def schedule_weekly(activity, timeslot, timetable, end_date_str):      
     # Check if the value corresponds to any existing item in the global variable
-    for item in global_variable:
+    for item in timetable:
         if item[0] == activity:
             break  
     else:
@@ -80,18 +120,18 @@ def schedule_weekly(activity, timeslot, global_variable, end_date_str):
         date_datetime = datetime.strptime(current_date, '%Y-%m-%d')
         # Append the (value, timeslot) tuple to global_variable for each week until end_date is reached
         while date_datetime <= end_date:
-            global_variable.append((activity, timeslot))
+            timetable.append((activity, timeslot))
             date_datetime += timedelta(days=7)  # Move to the same weekday of the next week
             # Construct a new timeslot tuple with the updated date  
             timeslot = (f"{timeslot[0].split()[0]} {date_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
-    return global_variable
+    return timetable
 
 
 
 
-def schedule_twice_weekly(activity, timeslot, global_variable, end_date_str):
+def schedule_twice_weekly(activity, timeslot, timetable, end_date_str):
     # Check if the value corresponds to any existing item in the global variable
-    for item in global_variable:
+    for item in timetable:
         if item[0] == activity:
             break
     else:
@@ -112,14 +152,14 @@ def schedule_twice_weekly(activity, timeslot, global_variable, end_date_str):
                 date_datetime -= timedelta(days=2)  
                 timeslot = (f"{date_datetime.strftime('%A')} {date_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
             # Check if the value and timeslot already exist in global_variable
-            for item in global_variable:
+            for item in timetable:
                 if item[1] == timeslot:
                      # Find a close alternative timeslot with the same duration that is not in global_variable
-                    timeslot = alternative_scheduletwice_timeslot(timeslot, global_variable)
+                    timeslot = alternative_scheduletwice_timeslot(timeslot, timetable)
                     date_datetime = datetime.strptime(timeslot[0].split()[1], '%Y-%m-%d')
             new_date_datetime = date_datetime
             while new_date_datetime <= end_date:
-                global_variable.append((activity, timeslot))
+                timetable.append((activity, timeslot))
                 new_date_datetime += timedelta(days=7)  # Move to the same weekday of the next week
                 timeslot = (f"{timeslot[0].split()[0]} {new_date_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
             date_datetime += timedelta(days=3)
@@ -129,12 +169,12 @@ def schedule_twice_weekly(activity, timeslot, global_variable, end_date_str):
                 date_datetime -= timedelta(days=2)  
                 timeslot = (f"{date_datetime.strftime('%A')} {date_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
 
-    return global_variable
+    return timetable
 
 
 
-def schedule_bi_weekly(value, timeslot, global_variable, end_date_str):
-    for item in global_variable:
+def schedule_bi_weekly(value, timeslot, timetable, end_date_str):
+    for item in timetable:
         if item[0] == value:
             break  
     else:
@@ -146,14 +186,14 @@ def schedule_bi_weekly(value, timeslot, global_variable, end_date_str):
         # Convert the date string to a datetime object
         date_datetime = datetime.strptime(current_date, '%Y-%m-%d')
         while date_datetime <= end_date:
-            global_variable.append((value, timeslot))
+            timetable.append((value, timeslot))
             date_datetime += timedelta(days=14)  # Move to the same weekday of the next week
             timeslot = (f"{timeslot[0].split()[0]} {date_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
-    return global_variable
+    return timetable
 
 
 
-def alternative_scheduletwice_timeslot(timeslot, global_variable):
+def alternative_scheduletwice_timeslot(timeslot, timetable):
     global timeslots
         
     # Convert the date string to a datetime object
@@ -161,7 +201,7 @@ def alternative_scheduletwice_timeslot(timeslot, global_variable):
     # Get the start and end of the week containing the given date
     start_of_week = week_datetime - timedelta(days=week_datetime.weekday())
     end_of_week = start_of_week + timedelta(days=6)
-    available_timeslots = find_available_timeslots(timeslots, global_variable)
+    available_timeslots = find_available_timeslots(timeslots, timetable)
     for available_timeslot in available_timeslots:
         if available_timeslot[3] == timeslot[3]:
             if start_of_week <= datetime.strptime(available_timeslot[0], '%A %Y-%m-%d') <= end_of_week:
@@ -169,18 +209,18 @@ def alternative_scheduletwice_timeslot(timeslot, global_variable):
             
 
 
-def find_available_timeslots(timeslots, global_variable):
+def find_available_timeslots(timeslots, timetable):
     available_timeslots = []
     for timeslot in timeslots:
         # Check if the timeslot is not in global_variable
-        if all(item[1] != timeslot for item in global_variable):
+        if all(item[1] != timeslot for item in timetable):
             available_timeslots.append(timeslot)
     return available_timeslots
 
 
 
-def schedule_monthly(value, timeslot, global_variable, end_date_str):
-    for item in global_variable:
+def schedule_monthly(value, timeslot, timetable, end_date_str):
+    for item in timetable:
         if item[0] == value:
             break
     else:
@@ -205,14 +245,14 @@ def schedule_monthly(value, timeslot, global_variable, end_date_str):
                     new_datetime = date_datetime + timedelta(days=1)
                     timeslot = (f"{new_datetime.strftime('%A')} {new_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
             # Check if the value and timeslot already exist in global_variable
-            for item in global_variable:
+            for item in timetable:
                 if item[1] == timeslot:
                      # Find a close alternative timeslot with the same duration that is not in global_variable
-                    alternative_timeslot = alternative_month_timeslot(timeslot, global_variable)
+                    alternative_timeslot = alternative_month_timeslot(timeslot, timetable)
                     # Append the alternative timeslot to global_variable
-                    global_variable.append((value, alternative_timeslot))
+                    timetable.append((value, alternative_timeslot))
             else:
-                global_variable.append((value, timeslot))
+                timetable.append((value, timeslot))
 
         #    # Increase the datetime object by exactly one month
         #     date_datetime += relativedelta(months=1)
@@ -226,12 +266,12 @@ def schedule_monthly(value, timeslot, global_variable, end_date_str):
             # Construct a new timeslot tuple with the updated date  
             timeslot = (f"{timeslot[0].split()[0]} {date_datetime.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
 
-    return global_variable
+    return timetable
 
 
 
 
-def alternative_month_timeslot(timeslot, global_variable):
+def alternative_month_timeslot(timeslot, timetable):
     # Get the date of the timeslot
     date = timeslot[0].split()[1]
     date_datetime = datetime.strptime(date, '%Y-%m-%d')
@@ -251,7 +291,7 @@ def alternative_month_timeslot(timeslot, global_variable):
         date = datetime.strptime(date_str, '%Y-%m-%d')
         timeslot = (f"{date.strftime('%A')} {date.strftime('%Y-%m-%d')}", timeslot[1], timeslot[2], timeslot[3])
 
-        for item in global_variable:
+        for item in timetable:
             if item[1] == timeslot:
                 break
         else:
@@ -313,18 +353,10 @@ timeslots = generate_timeslots()
 # start_end_times = [(timeslot[1], timeslot[2]) for timeslot in timeslots]
 
 # Example usage:
-global_variable = []
+timetable = []
 
-
-activity_info = [{'name': 'Class C', 'duration': 2, 'occurrence_type': 'weekly'},
-                 {'name': 'Class A', 'duration': 1, 'occurrence_type': 'once'}, 
-                 {'name': 'Class B', 'duration': 4, 'occurrence_type': 'twice weekly'},
-                 {'name': 'Church', 'duration': 4, 'occurrence_type': 'Bi-weekly'},
-                 {'name': 'Class D', 'duration': 3, 'occurrence_type': 'monthly'}]
-# timeslot = ('Thursday 2024-02-01', '08:00', '10:00', 2)
-# global_variable = []
 
 for timeslot in timeslots:
-    global_variable = filter_activities_by_duration(activity_info, timeslot, global_variable, end_date_str)
+    timetable = filter_activities_by_duration(activity_info, timeslot, timetable, end_date_str)
 
-print(global_variable)
+print(timetable)

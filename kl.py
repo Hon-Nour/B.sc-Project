@@ -1,7 +1,11 @@
 import random
 from datetime import datetime, timedelta
 import calendar
+from website.timeslot import generate_timeslots
 # from dateutil.relativedelta import relativedelta
+from website import db
+from website.models import Users, Role, Biodata, Activitycategory, Occurrence, semester, Activity, Time # type: ignore
+from website import create_app
 
 
 # Example usage:
@@ -266,25 +270,25 @@ end_date_str = "2024-03-29"
 
 
 
-def generate_timeslots():
-    days = list_weekdays_between_dates(start_date_str, end_date_str)
-    timeslots = []
+# def generate_timeslots():
+#     days = list_weekdays_between_dates(start_date_str, end_date_str)
+#     timeslots = []
 
-    for day in days:
-        for duration in range (1,9):
-            max_hour = 18 - (duration - 1)
-            for hour in range(8, max_hour):  # From 8:00 to 17:00 (inclusive)
-                timeslot_start = f"{hour:02d}:00"
-                timeslot_end = f"{hour+duration:02d}:00"
-                timeslots.append((day, timeslot_start, timeslot_end, duration))
+#     for day in days:
+#         for duration in range (1,9):
+#             max_hour = 18 - (duration - 1)
+#             for hour in range(8, max_hour):  # From 8:00 to 17:00 (inclusive)
+#                 timeslot_start = f"{hour:02d}:00"
+#                 timeslot_end = f"{hour+duration:02d}:00"
+#                 timeslots.append((day, timeslot_start, timeslot_end, duration))
 
-            # # If the duration is 2 hours, add the next consecutive timeslot
-            # if hour != 17:  # Check if it's not the last hour of the day
-            #     timeslot_start_next = f"{hour:02d}:00"
-            #     timeslot_end_next = f"{hour+2:02d}:00"
-            #     timeslots.append((day, timeslot_start_next, timeslot_end_next))
+#             # # If the duration is 2 hours, add the next consecutive timeslot
+#             # if hour != 17:  # Check if it's not the last hour of the day
+#             #     timeslot_start_next = f"{hour:02d}:00"
+#             #     timeslot_end_next = f"{hour+2:02d}:00"
+#             #     timeslots.append((day, timeslot_start_next, timeslot_end_next))
 
-    return timeslots
+#     return timeslots
 
 # Generate timeslots
 timeslots = generate_timeslots()
@@ -297,8 +301,8 @@ value_list = [{'name': 'Class C', 'duration': 2, 'occurrence_type': 'weekly'},
               {'name': 'Class A', 'duration': 1, 'occurrence_type': 'once'}, 
               {'name': 'Class B', 'duration': 4, 'occurrence_type': 'twice weekly'},   
               {'name': 'Class D', 'duration': 3, 'occurrence_type': 'monthly'}]
-# timeslot = ('Thursday 2024-02-01', '08:00', '10:00', 2)
-# global_variable = []
+
+joy = [{'name':'','occurence_id':'', 'category_id':'', 'duration':'', 'total_articipants':''}]
 
 def filter_activities_by_duration(activity_info, timeslot, global_variable, end_date_str):
     for activity in activity_info:
@@ -514,34 +518,6 @@ available_timeslots = find_available_timeslots(timeslots, global_variable)
 #         yumm = schedule_monthly(value, timeslot, global_variable, end_date_str)
 
 # print(yumm)
-
-timeslot = ('Thursday 2024-02-01', '08:00', '09:00', 1)
-activity = [{'name': 'Class B', 'duration': 4, 'occurrence_type': 'twice weekly'}]
-global_variable = schedule_bi_weekly(activity, timeslot, global_variable, end_date_str)
-print(global_variable)
-# for value in value_list:
-#     yumm = schedule_monthly(value, timeslot, global_variable, end_date_str)
-
-# print(yumm)
-            
-# from datetime import datetime
-# from dateutil.relativedelta import relativedelta
-
-# # Assuming current_date is a string in the format '%Y-%m-%d'
-# current_date = '2024-03-31'
-
-# # Convert the string to a datetime object
-# date_datetime = datetime.strptime(current_date, '%Y-%m-%d')
-
-# # Increase the datetime object by exactly one month
-# date_datetime += relativedelta(months=1)
-
-# # Convert it back to a string if needed
-# new_date = date_datetime.strftime('%Y-%m-%d')
-
-# print(new_date)  # Output will be the date increased by one month
-
-
 # for timeslot in timeslots:
 
 #     # Extract the date string from the timeslot tuple
@@ -573,3 +549,80 @@ print(global_variable)
 
 
 # check_timeslot_validity(timeslots)
+
+# def prioritize_activities(activities):
+#     # Define the category prioritization system
+#     category_priority = {
+#         'year 1 general lecture': 1,
+#         'year 2 general lecture': 2,
+#         'Faculty meeting': 3,
+#         'year 1 lecture': 4,
+#         'year 2 lecture': 5,
+#         'Impromptu exam': 6,
+#         'faculty academic event': 7,
+#         'Faculty Non-academic event': 8,
+#         'foreign event': 9,
+#         'religious activity': 10
+#     }
+    
+#     # Define a sorting key function to assign priority values to activities
+#     def get_priority(activity):
+#         category = activity['category_id']
+#         return category_priority.get(category, float('inf'))  # Default to highest priority if category not found
+    
+#     # Sort the activities based on their priority
+#     sorted_activities = sorted(activities, key=get_priority)
+    
+#     return sorted_activities
+
+# # Example usage:
+# activities = [
+#     {'name': 'Lecture 1', 'category_id': 'year 1 lecture'},
+#     {'name': 'Faculty meeting', 'category_id': 'Faculty meeting'},
+#     {'name': 'General lecture', 'category_id': 'year 2 general lecture'}
+#     # Add more activities with their categories
+# ]
+
+# # Prioritize the activities
+# prioritized_activities = prioritize_activities(activities)
+# print(prioritized_activities)
+
+
+
+from website import create_app
+from website.models import Activity, Occurrence
+
+def retrieve_activities():
+    app = create_app()
+    with app.app_context():
+        # Querying activities and joining with Occurrence to get the type
+        activities = (
+            db.session.query(
+                Activity.name,
+                Occurrence.type,
+                Activity.duration,
+                Activity.total_participants,
+                Activity.category_id
+            )
+            .join(Occurrence, Activity.occurrence_id == Occurrence.id)
+            .order_by(Activity.category_id)
+            .all()
+        )
+
+        # Extracting the desired fields from each activity
+        activity_data = []
+        for activity in activities:
+            activity_info = {
+                'name': activity.name,
+                'occurrence_type': activity.type,  # Changed from occurrence_id to type
+                'duration': activity.duration,
+                'total_participants': activity.total_participants,
+                'category_id': activity.category_id
+            }
+            activity_data.append(activity_info)
+
+        return activity_data
+
+# Now you can call the function to retrieve activities
+activities = retrieve_activities()
+print(timeslots)
