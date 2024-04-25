@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View-Schedule</title>
+    <link href="./style.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <style>
+      .rotate {
+        transition: transform 0.5s ease;
+      }
+      .rotate.rotate-180 {
+        transform: rotate(180deg);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-[#e4e0e0] h-screen relative">
+      <div
+        id="overlay"
+        class="absolute left-0 h-screen w-screen bg-black/70 text-gray-600 hidden"
+      >
+        <div class="sidebar bg-white h-full px-9 py-5">
+          <nav class="flex items-center gap-9">
+            <i id="cancel" class="p-1 fa-solid fa-x text-2xl"></i>
+            <h1 class="text-lg font-medium ml-11">HallAllocation</h1>
+          </nav>
+
+          <div class="menus mt-16">
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-solid fa-qrcode"></i>
+              <h3 class="font-medium">Dashboard</h3>
+            </div>
+
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-regular fa-calendar-days"></i>
+              <h3 class="font-medium">Schedule</h3>
+            </div>
+
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-regular fa-comment-dots"></i>
+              <h3 class="font-medium">Feedback</h3>
+            </div>
+
+            <div class="flex items-center gap-4 mb-9">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <h3 class="font-medium">Signout</h3>
+            </div>
+          </div>
+        </div>
+        <div class=""></div>
+      </div>
+      <nav
+        class="w-screen flex justify-between text-gray-600 px-9 py-4 bg-white"
+      >
+        <div class="flex items-center gap-4">
+          <i id="b-menu" class="p-1 fa-solid fa-bars text-2xl"></i>
+
+          <div class="flex gap-6 items-center tracking-wide">
+            <h1 class="text-lg font-medium">HallAllocation</h1>
+            <span>|</span>
+            <p class="text-[15px] pt-[2px]">Schedule</p>
+          </div>
+        </div>
+        <h
+          class="user-logo font-medium text-xl border-2 py-1 px-3 rounded-full border-gray-600 text-gray-600"
+          >H</h
+        >
+      </nav>
+
+      <div class="w-full">
+        <div class="control w-full flex justify-between py-4 px-9">
+          <div
+            id="form-view-parent"
+            class="flex items-center text-gray-600 font-medium gap-5 cursor-pointer"
+          >
+            <p class="view ml-2">View Schedule by</p>
+            <i
+              id="form-view-toggle"
+              class="fa-solid fa-chevron-down rotate"
+            ></i>
+          </div>
+          <div>
+            <button
+              class="create-button flex items-center bg-gray-600 text-white rounded-md py-4 px-6 gap-3"
+            >
+              <i class="fa-solid fa-plus"></i>
+              <span class="c-btn-text">Create new Schedule</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="mt-6 max-w-screen-lg mx-auto px-9">
+
+          <h1 class="mb-3 text-gray-600 font-medium text-lg tracking-wide underline">Schedule Name</h1>
+          <table class="w-full bg-white shadow-md rounded-lg">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="border border-gray-400 px-4 py-2">Day</th>
+                <th class="border border-gray-400 px-4 py-2">8 AM</th>
+                <th class="border border-gray-400 px-4 py-2">9 AM</th>
+                <th class="border border-gray-400 px-4 py-2">10 AM</th>
+                <th class="border border-gray-400 px-4 py-2">11 AM</th>
+                <th class="border border-gray-400 px-4 py-2">12 PM</th>
+                <th class="border border-gray-400 px-4 py-2">1 PM</th>
+                <th class="border border-gray-400 px-4 py-2">2 PM</th>
+                <th class="border border-gray-400 px-4 py-2">3 PM</th>
+                <th class="border border-gray-400 px-4 py-2">4 PM</th>
+                <th class="border border-gray-400 px-4 py-2">5 PM</th>
+                <th class="border border-gray-400 px-4 py-2">6 PM</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-700">
+              <!-- 11 Rows -->
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Sunday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Monday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Tuesday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Wednesday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Thursday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Friday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <tr>
+                <td class="col-head border px-4 py-2 font-medium">Saturday</td>
+                <td class="border px-4 py-2">Row 1, Cell 2</td>
+                <td class="border px-4 py-2">Row 1, Cell 3</td>
+                <td class="border px-4 py-2">Row 1, Cell 4</td>
+                <td class="border px-4 py-2">Row 1, Cell 5</td>
+                <td class="border px-4 py-2">Row 1, Cell 6</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+                <td class="border px-4 py-2">Row 1, Cell 7</td>
+              </tr>
+
+              <!-- Repeat for 10 more rows -->
+            </tbody>
+          </table>
+        </div>
+
+        <div
+          id="form-view"
+          class="hidden absolute w-screen h-[83vh] bottom-0 bg-black/95 justify-center items-center px-80"
+        >
+          <form action="" class="w-full px-32 py-16">
+            <div class="w-full mb-10">
+              <label for="" class="block text-white">Select Session</label>
+              <input
+                type="text"
+                class="w-full bg-transparent text-white outline-none border-2 border-white py-4 px-3 rounded-md placeholder:text-white placeholder:text-base mt-3"
+                placeholder="Choose a session"
+              />
+            </div>
+
+            <div class="w-full mb-10">
+              <label for="" class="block text-white">Select Semester</label>
+              <input
+                type="text"
+                class="w-full bg-transparent text-white outline-none border-2 border-white py-4 px-3 rounded-md placeholder:text-white placeholder:text-base mt-3"
+                placeholder="Choose a semester"
+              />
+            </div>
+
+            <div class="w-full mt-3">
+              <button
+                class="bg-white text-gray-600 w-full py-4 rounded-md font-medium tracking-wider"
+              >
+                View Schedule
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const formViewToggle = document.querySelector("#form-view-toggle");
+      const formView = document.querySelector("#form-view");
+      const formViewParent = document.querySelector("#form-view-parent");
+
+      let show = false;
+
+      formViewParent.addEventListener("click", () => {
+        show = !show;
+        if (show === false) {
+          formView.classList.remove("flex");
+          formView.classList.add("hidden");
+        } else {
+          formView.classList.remove("hidden");
+          formView.classList.add("flex");
+        }
+        formViewToggle.classList.toggle("rotate-180");
+      });
+    </script>
+  </body>
+</html>

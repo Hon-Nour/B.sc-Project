@@ -334,27 +334,26 @@ end_date_str = "2024-02-29"
 
 
 
-def generate_timeslots():
+def generate_day_timeslots():
     days = list_weekdays_between_dates(start_date_str, end_date_str)
     timeslots = []
 
     for day in days:
-        for duration in range (1,9):
-            max_hour = 18 - (duration - 1)
-            for hour in range(8, max_hour):  # From 8:00 to 17:00 (inclusive)
-                timeslot_start = f"{hour:02d}:00"
-                timeslot_end = f"{hour+duration:02d}:00"
-                timeslots.append((day, timeslot_start, timeslot_end, duration))
+        time = generate_timeslots
+    #     for duration in range (1,9):
+    #         max_hour = 18 - (duration - 1)
+    #         for hour in range(8, max_hour):  # From 8:00 to 17:00 (inclusive)
+    #             timeslot_start = f"{hour:02d}:00"
+    #             timeslot_end = f"{hour+duration:02d}:00"
+    #             timeslots.append((day, timeslot_start, timeslot_end, duration))
 
     return timeslots
 
 # Generate timeslots
 timeslots = generate_timeslots()
-# start_end_times = [(timeslot[1], timeslot[2]) for timeslot in timeslots]
 
 # Example usage:
 timetable = []
-
 
 for timeslot in timeslots:
     timetable = filter_activities_by_duration(activity_info, timeslot, timetable, end_date_str)
